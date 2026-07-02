@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentAuto - Alquiler de Vehículos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e3a5f;
+            --primary-light: #2a4a73;
+            --accent: #4ade80;
+            --accent-dark: #22c55e;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            height: 70px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-cart {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent-dark);
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--accent-dark);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* ===== MOBILE MENU ===== */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* ===== MAIN ===== */
+        main {
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+            color: white;
+            padding: 100px 24px 160px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800') center/cover;
+            opacity: 0.15;
+            mask-image: linear-gradient(to left, black, transparent);
+        }
+
+        .hero-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(74, 222, 128, 0.15);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            max-width: 600px;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #94a3b8;
+            max-width: 500px;
+            margin-bottom: 32px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .hero-checks {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .hero-checks span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .hero-checks i {
+            color: var(--accent);
+        }
+
+        /* ===== SEARCH BAR ===== */
+        .search-section {
+            position: relative;
+            z-index: 10;
+            margin-top: -60px;
+            padding: 0 24px;
+        }
+
+        .search-box {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            background: var(--bg);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+
+        /* ===== FEATURES ===== */
+        .features {
+            padding: 100px 24px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 32px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 24px;
+        }
+
+        .feature-card:nth-child(1) .feature-icon { background: #eff6ff; color: #3b82f6; }
+        .feature-card:nth-child(2) .feature-icon { background: #f0fdf4; color: #22c55e; }
+        .feature-card:nth-child(3) .feature-icon { background: #faf5ff; color: #a855f7; }
+
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* ===== CARS SECTION ===== */
+        .cars-section {
+            background: white;
+            padding: 100px 24px;
+        }
+
+        .cars-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .cars-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 48px;
+        }
+
+        .cars-header a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .car-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .car-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .car-image {
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .car-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .car-card:hover .car-image img {
+            transform: scale(1.05);
+        }
+
+        .car-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text);
+        }
+
+        .car-info {
+            padding: 24px;
+        }
+
+        .car-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .car-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .car-specs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .car-specs span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .car-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .car-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .car-price span {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            background: var(--primary);
+            padding: 80px 24px;
+        }
+
+        .stats-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        /* ===== FLEET PAGE ===== */
+        .fleet-layout {
+            display: flex;
+            gap: 32px;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .filters-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .filters-box {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 90px;
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .filters-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-group h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .price-range {
+            margin-top: 8px;
+        }
+
+        .price-range input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        .price-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .fleet-results {
+            flex: 1;
+        }
+
+        .fleet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .fleet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-light);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-image {
+            width: 50%;
+            position: relative;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-body {
+            width: 50%;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .modal-subtitle {
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .modal-price {
+            text-align: right;
+        }
+
+        .modal-price .amount {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .modal-price .period {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .modal-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: #f59e0b;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+
+        .spec-item i {
+            color: var(--text-light);
+            font-size: 18px;
+        }
+
+        .spec-item .label {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .spec-item .value {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .price-summary {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .price-row.total {
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+            margin-top: 12px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .price-row.total .amount {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        /* ===== CART DRAWER ===== */
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+        }
+
+        .cart-overlay.active {
+            display: block;
+        }
+
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            z-index: 2001;
+        }
+
+        .cart-overlay.active .cart-drawer {
+            transform: translateX(0);
+        }
+
+        .cart-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .cart-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-light);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-close:hover {
+            background: var(--bg);
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-light);
+        }
+
+        .cart-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--border);
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .cart-item-dates {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .cart-item-price {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+        }
+
+        .cart-footer {
+            padding: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .cart-total .label {
+            color: var(--text-light);
+        }
+
+        .cart-total .amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        /* ===== ADMIN ===== */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1280px;
+            margin: 0 auto 32px;
+            padding: 0 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-card-header .label {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .change {
+            font-size: 13px;
+            color: var(--accent-dark);
+            font-weight: 600;
+        }
+
+        .admin-tabs {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            background: white;
+            border-radius: 12px 12px 0 0;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            overflow: hidden;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: var(--bg);
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid var(--border);
+            border-top: none;
+            padding: 24px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .data-table tr:hover {
+            background: var(--bg);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .status-rented {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-maintenance {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            max-width: 800px;
+        }
+
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .steps {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .step {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 48px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.15);
+        }
+
+        .step:nth-child(1) .step-number { background: var(--primary); }
+        .step:nth-child(2) .step-number { background: var(--accent-dark); }
+        .step:nth-child(3) .step-number { background: #a855f7; }
+        .step:nth-child(4) .step-number { background: #f59e0b; }
+
+        .step-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            flex: 1;
+        }
+
+        .step-content h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* ===== CONTACT ===== */
+        .contact-layout {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 60px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-form h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .info-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .info-item:nth-child(1) .info-icon { background: #eff6ff; color: #3b82f6; }
+        .info-item:nth-child(2) .info-icon { background: #f0fdf4; color: #22c55e; }
+        .info-item:nth-child(3) .info-icon { background: #faf5ff; color: #a855f7; }
+        .info-item:nth-child(4) .info-icon { background: #fff7ed; color: #f97316; }
+
+        .info-item div {
+            font-size: 14px;
+        }
+
+        .info-item .label {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .info-item .value {
+            color: var(--text-light);
+        }
+
+        .cta-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+            border-radius: 16px;
+            padding: 32px;
+            color: white;
+        }
+
+        .cta-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .cta-card p {
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--primary);
+            color: #94a3b8;
+            padding: 80px 24px 40px;
+        }
+
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .footer-col h4 {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .social-links a:hover {
+            background: var(--accent-dark);
+        }
+
+        .footer-bottom {
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--text);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            color: var(--accent);
+            font-size: 20px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 42px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .cars-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-container { grid-template-columns: repeat(2, 1fr); }
+            .fleet-layout { flex-direction: column; }
+            .filters-sidebar { width: 100%; }
+            .fleet-grid { grid-template-columns: 1fr; }
+            .admin-stats { grid-template-columns: repeat(2, 1fr); }
+            .contact-layout { grid-template-columns: 1fr; }
+            .footer-container { grid-template-columns: repeat(2, 1fr); }
+            .modal-content { flex-direction: column; }
+            .modal-image { width: 100%; height: 250px; }
+            .modal-body { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: block; }
+            .hero { padding: 60px 20px 120px; }
+            .hero h1 { font-size: 32px; }
+            .hero-actions { flex-direction: column; }
+            .search-grid { grid-template-columns: 1fr; }
+            .cars-grid { grid-template-columns: 1fr; }
+            .stats-container { grid-template-columns: 1fr; }
+            .cars-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .step { flex-direction: column; }
+            .form-row { grid-template-columns: 1fr; }
+            .admin-stats { grid-template-columns: 1fr; }
+            .footer-container { grid-template-columns: 1fr; }
+            .data-table { display: block; overflow-x: auto; }
+        }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 0;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" onclick="app.navigate('home')">
+                <div class="logo-icon"><i class="fas fa-car"></i></div>
+                RentAuto
+            </a>
+            
+            <ul class="nav-links">
+                <li><a onclick="app.navigate('home')" class="nav-link active" data-page="home">Inicio</a></li>
+                <li><a onclick="app.navigate('fleet')" class="nav-link" data-page="fleet">Flota</a></li>
+                <li><a onclick="app.navigate('how')" class="nav-link" data-page="how">Cómo funciona</a></li>
+                <li><a onclick="app.navigate('contact')" class="nav-link" data-page="contact">Contacto</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="btn-cart" onclick="app.toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" id="cart-badge">0</span>
+                </button>
+                <button class="btn-primary" onclick="app.navigate('admin')">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+                <button class="mobile-toggle" onclick="app.toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a onclick="app.navigate('home'); app.toggleMobileMenu()">Inicio</a>
+            <a onclick="app.navigate('fleet'); app.toggleMobileMenu()">Flota</a>
+            <a onclick="app.navigate('how'); app.toggleMobileMenu()">Cómo funciona</a>
+            <a onclick="app.navigate('contact'); app.toggleMobileMenu()">Contacto</a>
+            <a onclick="app.navigate('admin'); app.toggleMobileMenu()">Panel Admin</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- HOME PAGE -->
+        <section id="page-home" class="page-section active">
+            <div class="hero">
+                <div class="hero-container">
+                    <div class="hero-badge">Más de 500 vehículos disponibles</div>
+                    <h1>Tu viaje comienza con el <span>auto perfecto</span></h1>
+                    <p>Descubre nuestra flota premium de vehículos. Desde económicos para la ciudad hasta SUVs de lujo para aventuras.</p>
+                    <div class="hero-actions">
+                        <button class="btn-primary" onclick="app.navigate('fleet')" style="padding: 16px 32px; font-size: 16px;">
+                            Ver vehículos <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button class="btn-secondary" onclick="app.navigate('how')" style="padding: 16px 32px; font-size: 16px; color: white; border-color: rgba(255,255,255,0.3);">
+                            <i class="fas fa-play-circle"></i> Ver cómo funciona
+                        </button>
+                    </div>
+                    <div class="hero-checks">
+                        <span><i class="fas fa-check-circle"></i> Sin depósito</span>
+                        <span><i class="fas fa-check-circle"></i> Cancelación gratis</span>
+                        <span><i class="fas fa-check-circle"></i> Kilometraje ilimitado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <div class="search-grid">
+                        <div class="form-group">
+                            <label>Ubicación</label>
+                            <input type="text" id="home-location" placeholder="Ciudad o aeropuerto">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha recogida</label>
+                            <input type="date" id="home-pickup">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha devolución</label>
+                            <input type="date" id="home-dropoff">
+                        </div>
+                        <button class="btn-primary" onclick="app.searchFromHome()" style="height: 46px;">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="section-header">
+                    <h2>¿Por qué elegir RentAuto?</h2>
+                    <p>La mejor experiencia de alquiler con tecnología de punta y servicio excepcional</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                        <h3>Reserva Instantánea</h3>
+                        <p>Confirma tu reserva en menos de 2 minutos. Sin papeleo, sin filas, sin esperas innecesarias.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Seguro Completo</h3>
+                        <p>Todos nuestros vehículos incluyen seguro a todo riesgo. Viaja con total tranquilidad.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                        <h3>Soporte 24/7</h3>
+                        <p>Nuestro equipo está disponible las 24 horas para ayudarte con cualquier necesidad.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cars-section">
+                <div class="cars-container">
+                    <div class="cars-header">
+                        <div>
+                            <h2>Vehículos destacados</h2>
+                            <p style="color: var(--text-light);">Los favoritos de nuestros clientes esta semana</p>
+                        </div>
+                        <a onclick="app.navigate('fleet')">Ver toda la flota <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="cars-grid" id="featured-cars"></div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stats-container">
+                    <div>
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Vehículos</div>
+                    </div>
+                    <div>
+                        <div class="stat-number">50k+</div>
+                        <div class="stat-label">Clientes felices</div>
+                    </div>
+                    <div>
+                        <div class="stat-number">25</div>
+                        <div class="stat-label">Ciudades</div>
+                    </div>
+                    <div>
+                        <div class="stat-number">4.9</div>
+                        <div class="stat-label">Rating promedio</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FLEET PAGE -->
+        <section id="page-fleet" class="page-section">
+            <div class="hero" style="padding: 60px 24px;">
+                <div class="hero-container">
+                    <h1 style="font-size: 42px;">Nuestra flota</h1>
+                    <p>Encuentra el vehículo perfecto para tu próximo viaje</p>
+                </div>
+            </div>
+
+            <div class="fleet-layout">
+                <aside class="filters-sidebar">
+                    <div class="filters-box">
+                        <div class="filters-header">
+                            <h3>Filtros</h3>
+                            <button class="clear-btn" onclick="app.resetFilters()">Limpiar</button>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <h4>Categoría</h4>
+                            <div id="category-filters"></div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h4>Transmisión</h4>
+                            <label class="filter-option">
+                                <input type="checkbox" value="manual" onchange="app.applyFilters()">
+                                <span>Manual</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" value="automatic" onchange="app.applyFilters()">
+                                <span>Automática</span>
+                            </label>
+                        </div>
+
+                        <div class="filter-group">
+                            <h4>Precio máximo: <span id="price-value" style="color: var(--primary); font-weight: 700;">$200</span></h4>
+                            <div class="price-range">
+                                <input type="range" id="price-range" min="30" max="500" value="200" oninput="app.updatePriceLabel(this.value); app.applyFilters()">
+                                <div class="price-labels">
+                                    <span>$30</span>
+                                    <span>$500</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h4>Combustible</h4>
+                            <label class="filter-option">
+                                <input type="checkbox" value="gasoline" onchange="app.applyFilters()">
+                                <span>Gasolina</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" value="diesel" onchange="app.applyFilters()">
+                                <span>Diésel</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" value="electric" onchange="app.applyFilters()">
+                                <span>Eléctrico</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" value="hybrid" onchange="app.applyFilters()">
+                                <span>Híbrido</span>
+                            </label>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="fleet-results">
+                    <div class="fleet-header">
+                        <p><strong id="results-count">0</strong> vehículos encontrados</p>
+                        <select id="sort-select" onchange="app.applyFilters()" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);">
+                            <option value="price-asc">Precio: menor a mayor</option>
+                            <option value="price-desc">Precio: mayor a menor</option>
+                            <option value="rating">Mejor valorados</option>
+                            <option value="name">Nombre A-Z</option>
+                        </select>
+                    </div>
+                    <div class="fleet-grid" id="fleet-grid"></div>
+                    <div class="no-results" id="no-results" style="display: none;">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+                        <h3>No se encontraron vehículos</h3>
+                        <p>Intenta ajustar tus filtros para ver más opciones</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section id="page-how" class="page-section">
+            <div class="hero" style="padding: 60px 24px;">
+                <div class="hero-container" style="text-align: center;">
+                    <h1 style="font-size: 42px;">Cómo funciona</h1>
+                    <p>Alquila un auto en 4 simples pasos</p>
+                </div>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Busca tu vehículo</h3>
+                        <p>Explora nuestra flota filtrando por categoría, precio, transmisión y más. Usa la barra de búsqueda para encontrar el auto ideal para tu viaje.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Selecciona fechas</h3>
+                        <p>Elige las fechas de recogida y devolución. Nuestro sistema calcula automáticamente el precio total incluyendo seguros y extras.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Confirma tu reserva</h3>
+                        <p>Revisa los detalles y confirma tu reserva. No necesitas tarjeta de crédito para reservar, paga al recoger el vehículo.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Recoge y disfruta</h3>
+                        <p>Presenta tu licencia de conducir vigente y recoge las llaves. ¡Disfruta tu viaje con total tranquilidad!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT PAGE -->
+        <section id="page-contact" class="page-section">
+            <div class="hero" style="padding: 60px 24px;">
+                <div class="hero-container" style="text-align: center;">
+                    <h1 style="font-size: 42px;">Contacto</h1>
+                    <p>Estamos aquí para ayudarte</p>
+                </div>
+            </div>
+            <div class="contact-layout">
+                <div class="contact-form">
+                    <h2>Envíanos un mensaje</h2>
+                    <form onsubmit="app.handleContact(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" required placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" required placeholder="tu@email.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Asunto</label>
+                            <select>
+                                <option>Consulta general</option>
+                                <option>Reserva existente</option>
+                                <option>Problema con vehículo</option>
+                                <option>Facturación</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Mensaje</label>
+                            <textarea rows="4" required placeholder="¿En qué podemos ayudarte?" style="padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: fit-content;">
+                            Enviar mensaje
+                        </button>
+                    </form>
+                </div>
+                <div class="contact-info">
+                    <div class="info-card">
+                        <h3>Información de contacto</h3>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <div>
+                                <div class="label">Dirección</div>
+                                <div class="value">Av. Principal 123, Ciudad de México</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-phone"></i></div>
+                            <div>
+                                <div class="label">Teléfono</div>
+                                <div class="value">+52 55 1234 5678</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <div class="label">Email</div>
+                                <div class="value">hola@rentauto.com</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-clock"></i></div>
+                            <div>
+                                <div class="label">Horario</div>
+                                <div class="value">Lun - Dom: 24 horas</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cta-card">
+                        <h3>¿Necesitas ayuda urgente?</h3>
+                        <p>Nuestro equipo de soporte está disponible 24/7 para asistirte.</p>
+                        <button class="btn-primary" style="background: rgba(255,255,255,0.2);">
+                            <i class="fas fa-comments"></i> Iniciar chat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN PAGE -->
+        <section id="page-admin" class="page-section">
+            <div class="hero" style="padding: 60px 24px;">
+                <div class="hero-container">
+                    <h1 style="font-size: 42px;">Panel de Administración</h1>
+                    <p>Gestiona vehículos, reservas y clientes</p>
+                </div>
+            </div>
+
+            <div style="padding: 40px 0;">
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="label">Total Vehículos</span>
+                            <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-car"></i></div>
+                        </div>
+                        <div class="value" id="admin-total-cars">0</div>
+                        <div class="change">+12% vs mes pasado</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="label">Reservas Activas</span>
+                            <div class="stat-icon" style="background: #f0fdf4; color: #22c55e;"><i class="fas fa-calendar-check"></i></div>
+                        </div>
+                        <div class="value" id="admin-active-rentals">0</div>
+                        <div class="change">+8% vs mes pasado</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="label">Ingresos (Mes)</span>
+                            <div class="stat-icon" style="background: #faf5ff; color: #a855f7;"><i class="fas fa-dollar-sign"></i></div>
+                        </div>
+                        <div class="value" id="admin-revenue">$0</div>
+                        <div class="change">+24% vs mes pasado</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="label">Clientes Nuevos</span>
+                            <div class="stat-icon" style="background: #fff7ed; color: #f97316;"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="value">142</div>
+                        <div class="change">Este mes</div>
+                    </div>
+                </div>
+
+                <div class="admin-tabs">
+                    <div class="tabs-nav">
+                        <button class="tab-btn active" onclick="app.setAdminTab('vehicles')">Vehículos</button>
+                        <button class="tab-btn" onclick="app.setAdminTab('reservations')">Reservas</button>
+                        <button class="tab-btn" onclick="app.setAdminTab('add')">Agregar Vehículo</button>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-panel active" id="tab-vehicles">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Vehículo</th>
+                                        <th>Categoría</th>
+                                        <th>Precio/día</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-vehicles-table"></tbody>
+                            </table>
+                        </div>
+                        <div class="tab-panel" id="tab-reservations">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Vehículo</th>
+                                        <th>Fechas</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-reservations-table"></tbody>
+                            </table>
+                        </div>
+                        <div class="tab-panel" id="tab-add">
+                            <form onsubmit="app.handleAddVehicle(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Marca</label>
+                                        <input type="text" name="brand" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Modelo</label>
+                                        <input type="text" name="model" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Año</label>
+                                        <input type="number" name="year" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Precio/día ($)</label>
+                                        <input type="number" name="price" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Categoría</label>
+                                        <select name="category">
+                                            <option value="economy">Económico</option>
+                                            <option value="compact">Compacto</option>
+                                            <option value="sedan">Sedán</option>
+                                            <option value="suv">SUV</option>
+                                            <option value="luxury">Lujo</option>
+                                            <option value="van">Van</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Transmisión</label>
+                                        <select name="transmission">
+                                            <option value="automatic">Automática</option>
+                                            <option value="manual">Manual</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Combustible</label>
+                                        <select name="fuel">
+                                            <option value="gasoline">Gasolina</option>
+                                            <option value="diesel">Diésel</option>
+                                            <option value="electric">Eléctrico</option>
+                                            <option value="hybrid">Híbrido</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Pasajeros</label>
+                                        <input type="number" name="seats" value="5" required>
+                                    </div>
+                                    <div class="form-group form-group-full">
+                                        <label>URL de imagen</label>
+                                        <input type="url" name="image" placeholder="https://images.unsplash.com/...">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 24px; display: flex; gap: 12px;">
+                                    <button type="submit" class="btn-primary">Agregar vehículo</button>
+                                    <button type="reset" class="btn-secondary">Limpiar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a class="logo" style="color: white;">
+                    <div class="logo-icon" style="background: var(--accent);"><i class="fas fa-car"></i></div>
+                    RentAuto
+                </a>
+                <p>La mejor experiencia de alquiler de vehículos con tecnología de punta y servicio excepcional.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Empresa</h4>
+                <ul>
+                    <li><a href="#">Sobre nosotros</a></li>
+                    <li><a href="#">Carreras</a></li>
+                    <li><a href="#">Prensa</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Soporte</h4>
+                <ul>
+                    <li><a href="#">Centro de ayuda</a></li>
+                    <li><a href="#">Términos de servicio</a></li>
+                    <li><a href="#">Política de privacidad</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Síguenos</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p> 2026 RentAuto. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Car Modal -->
+    <div class="modal-overlay" id="car-modal">
+        <div class="modal-content">
+            <div class="modal-image">
+                <img id="modal-img" src="" alt="">
+                <span class="car-badge" id="modal-badge" style="top: 20px; left: 20px;">SEDÁN</span>
+                <button class="modal-close" onclick="app.closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-header">
+                    <div>
+                        <div class="modal-title" id="modal-title">Toyota Corolla</div>
+                        <div class="modal-subtitle" id="modal-subtitle">2024</div>
+                    </div>
+                    <div class="modal-price">
+                        <div class="amount" id="modal-price">$45</div>
+                        <div class="period">/día</div>
+                    </div>
+                </div>
+                <div class="modal-rating" id="modal-rating">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <span>4.8 (234 reseñas)</span>
+                </div>
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <div class="label">Pasajeros</div>
+                            <div class="value" id="modal-seats">5</div>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-suitcase"></i>
+                        <div>
+                            <div class="label">Maletas</div>
+                            <div class="value" id="modal-luggage">2</div>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-cog"></i>
+                        <div>
+                            <div class="label">Transmisión</div>
+                            <div class="value" id="modal-transmission">Automática</div>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-gas-pump"></i>
+                        <div>
+                            <div class="label">Combustible</div>
+                            <div class="value" id="modal-fuel">Gasolina</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="date-inputs">
+                    <div class="form-group">
+                        <label>Recogida</label>
+                        <input type="date" id="modal-pickup">
+                    </div>
+                    <div class="form-group">
+                        <label>Devolución</label>
+                        <input type="date" id="modal-dropoff">
+                    </div>
+                </div>
+                <div class="price-summary">
+                    <div class="price-row">
+                        <span>Subtotal</span>
+                        <span id="modal-subtotal">$0</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Seguro</span>
+                        <span style="color: var(--accent-dark); font-weight: 600;">Incluido</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total estimado</span>
+                        <span class="amount" id="modal-total">$0</span>
+                    </div>
+                </div>
+                <button class="btn-primary" style="width: 100%; padding: 16px; font-size: 16px;" onclick="app.addToCart()">
+                    <i class="fas fa-calendar-check"></i> Reservar ahora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div class="cart-overlay" id="cart-overlay" onclick="app.toggleCart()"></div>
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header">
+            <h2>Tu reserva</h2>
+            <button class="cart-close" onclick="app.toggleCart()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-empty" id="cart-empty">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Tu carrito está vacío</h3>
+            <p>Agrega vehículos para comenzar tu reserva</p>
+            <button class="btn-primary" onclick="app.toggleCart(); app.navigate('fleet')" style="margin-top: 16px;">
+                Ver vehículos
+            </button>
+        </div>
+        <div class="cart-footer" id="cart-footer" style="display: none;">
+            <div class="cart-total">
+                <span class="label">Total</span>
+                <span class="amount" id="cart-total">$0</span>
+            </div>
+            <button class="btn-primary" style="width: 100%;" onclick="app.checkout()">
+                Proceder al pago
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Operación exitosa</span>
+    </div>
+
+    <script>
+        const app = {
+            cars: [
+                { id: 1, brand: "Toyota", model: "Corolla", year: 2024, category: "sedan", price: 45, transmission: "automatic", fuel: "gasoline", seats: 5, luggage: 2, rating: 4.8, reviews: 234, image: "https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?w=600", available: true, featured: true },
+                { id: 2, brand: "BMW", model: "X5", year: 2024, category: "suv", price: 120, transmission: "automatic", fuel: "diesel", seats: 5, luggage: 4, rating: 4.9, reviews: 189, image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600", available: true, featured: true },
+                { id: 3, brand: "Mercedes-Benz", model: "Clase C", year: 2024, category: "luxury", price: 95, transmission: "automatic", fuel: "gasoline", seats: 5, luggage: 2, rating: 4.7, reviews: 156, image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600", available: true, featured: true },
+                { id: 4, brand: "Honda", model: "Civic", year: 2023, category: "compact", price: 38, transmission: "manual", fuel: "gasoline", seats: 5, luggage: 2, rating: 4.6, reviews: 312, image: "https://images.unsplash.com/photo-1605816988060-b
