@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -40,54 +40,32 @@
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-destructive-border: var(--destructive-border);
 
-  --font-sans: 'Outfit', sans-serif;
+  --font-sans: 'Inter', sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
 }
 
 :root {
-  --background: 210 40% 98%;
-  --foreground: 217 33% 17%;
+  --background: 0 0% 100%;
+  --foreground: 214 76% 18%;
   --card: 0 0% 100%;
-  --card-foreground: 217 33% 17%;
+  --card-foreground: 214 76% 18%;
   --popover: 0 0% 100%;
-  --popover-foreground: 217 33% 17%;
-  --primary: 214 52% 24%;
+  --popover-foreground: 214 76% 18%;
+  --primary: 214 76% 18%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 214 52% 24%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 142 71% 45%;
+  --secondary: 214 30% 96%;
+  --secondary-foreground: 214 76% 18%;
+  --muted: 214 30% 96%;
+  --muted-foreground: 214 20% 45%;
+  --accent: 95 55% 42%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 214 52% 24%;
-  --radius: 0.5rem;
-}
-
-.dark {
-  --background: 217 33% 17%;
-  --foreground: 210 40% 98%;
-  --card: 214 52% 24%;
-  --card-foreground: 210 40% 98%;
-  --popover: 214 52% 24%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 210 40% 98%;
-  --primary-foreground: 214 52% 24%;
-  --secondary: 215 16% 47%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 215 16% 47%;
-  --muted-foreground: 210 40% 96%;
-  --accent: 142 71% 45%;
-  --accent-foreground: 214 52% 24%;
-  --destructive: 0 62% 30%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 215 16% 47%;
-  --input: 215 16% 47%;
-  --ring: 210 40% 98%;
+  --border: 214 25% 90%;
+  --input: 214 25% 90%;
+  --ring: 95 55% 42%;
+  --radius: 0.75rem;
 }
 
 @layer base {
@@ -96,5 +74,16 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .puffin-hero-overlay {
+    background: linear-gradient(
+      135deg,
+      hsl(214 76% 18% / 0.97) 0%,
+      hsl(214 76% 14% / 0.92) 50%,
+      hsl(214 76% 18% / 0.85) 100%
+    );
   }
 }

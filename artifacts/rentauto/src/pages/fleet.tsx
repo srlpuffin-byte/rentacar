@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { fleetIntro } from "@/lib/site-content";
 
 export default function Fleet() {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -178,8 +179,17 @@ export default function Fleet() {
   );
 
   return (
-    <div className="bg-background min-h-screen py-8">
-      <div className="container mx-auto px-4">
+    <div className="bg-background min-h-screen">
+      <div className="bg-primary text-primary-foreground py-16">
+        <div className="container mx-auto px-4 text-center max-w-3xl">
+          <h1 className="text-3xl md:text-4xl font-extrabold uppercase mb-4">
+            {fleetIntro.title}
+          </h1>
+          <p className="text-lg opacity-90 leading-relaxed">{fleetIntro.subtitle}</p>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           
           {/* Desktop Sidebar */}
@@ -193,7 +203,7 @@ export default function Fleet() {
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h1 className="text-3xl font-bold">Nuestra Flota</h1>
+                <h2 className="text-2xl font-bold">Nuestra Flota</h2>
                 <p className="text-muted-foreground">
                   {isLoading ? "Cargando vehículos..." : `${finalVehicles.length} vehículos encontrados`}
                 </p>

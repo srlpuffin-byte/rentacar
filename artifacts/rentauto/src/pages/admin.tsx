@@ -1,92 +1,144 @@
 import { useState } from "react";
-import { 
-  useGetStats, 
-  useListVehicles, 
+import {
+  useGetStats,
+  useListVehicles,
   useListReservations,
   useCreateVehicle,
   useDeleteVehicle,
   useDeleteReservation,
+  useUpdateVehicle,
   getListVehiclesQueryKey,
   getListReservationsQueryKey,
-  getGetStatsQueryKey
+  getGetStatsQueryKey,
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Car, CalendarCheck, TrendingUp, Users, Plus, Trash2 } from "lucide-react";
+import { Car, CalendarCheck, TrendingUp, Users, Trash2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+
+const STATUS_LABELS: Record<string, string> = {
+  available: "Disponible",
+  rented: "Alquilado",
+  maintenance: "Mantenimiento",
+};
+
+const STATUS_CLASSES: Record<string, string> = {
+  available: "bg-green-100 text-green-800 hover:bg-green-100",
+  rented: "bg-amber-100 text-amber-800 hover:bg-amber-100",
+  maintenance: "bg-red-100 text-red-800 hover:bg-red-100",
+};
+
+const RESERVATION_STATUS_LABELS: Record<string, string> = {
+  active: "Activa",
+  completed: "Completada",
+  cancelled: "Cancelada",
+};
+
+const RESERVATION_STATUS_CLASSES: Record<string, string> = {
+  active: "bg-blue-100 text-blue-800",
+  completed: "bg-gray-100 text-gray-800",
+  cancelled: "bg-red-100 text-red-800",
+};
 
 export default function Admin() {
-  const { data: stats, isLoading: isLoadingStats } = useGetStats();
+  const { data: stats } = useGetStats();
   const { data: vehicles, isLoading: isLoadingVehicles } = useListVehicles();
   const { data: reservations, isLoading: isLoadingReservations } = useListReservations();
-  
+
   const createVehicle = useCreateVehicle();
   const deleteVehicle = useDeleteVehicle();
   const deleteReservation = useDeleteReservation();
+  const updateVehicle = useUpdateVehicle();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleDeleteVehicle = (id: number) => {
-    if (confirm("¿Estás seguro de eliminar este vehículo?")) {
-      deleteVehicle.mutate({ id }, {
-        onSuccess: () => {
-          toast({ title: "Vehículo eliminado" });
-          queryClient.invalidateQueries({ queryKey: getListVehiclesQueryKey() });
-          queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
-        }
-      });
-    }
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: getListVehiclesQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
+  };
+
+  const handleDeleteVehicle = (id: number, name: string) => {
+    if (!confirm(`¿Eliminar "${name}"? Esta acción no se puede deshacer.`)) return;
+    deleteVehicle.mutate({ id }, {
+      onSuccess: () => {
+        toast({ title: "Vehículo eliminado" });
+        invalidateAll();
+      },
+    });
+  };
+
+  const handleStatusChange = (id: number, newStatus: string) => {
+    updateVehicle.mutate({ id, data: { status: newStatus } }, {
+      onSuccess: () => {
+        toast({ title: "Estado actualizado" });
+        invalidateAll();
+      },
+    });
   };
 
   const handleDeleteReservation = (id: number) => {
-    if (confirm("¿Estás seguro de cancelar esta reserva?")) {
-      deleteReservation.mutate({ id }, {
-        onSuccess: () => {
-          toast({ title: "Reserva cancelada" });
-          queryClient.invalidateQueries({ queryKey: getListReservationsQueryKey() });
-          queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
-        }
-      });
-    }
+    if (!confirm("¿Cancelar esta reserva?")) return;
+    deleteReservation.mutate({ id }, {
+      onSuccess: () => {
+        toast({ title: "Reserva cancelada" });
+        queryClient.invalidateQueries({ queryKey: getListReservationsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
+      },
+    });
   };
 
-  // Create Vehicle Form State
   const [newVehicle, setNewVehicle] = useState({
-    name: "", brand: "", category: "Sedán", transmission: "Automática", 
-    fuel: "Gasolina", seats: 5, pricePerDay: 50, status: "available", 
-    imageUrl: "", featured: false, description: ""
+    name: "",
+    brand: "",
+    category: "Económico",
+    transmission: "automatic",
+    fuel: "gasoline",
+    seats: 5,
+    pricePerDay: 50,
+    status: "available",
+    imageUrl: "",
+    featured: false,
+    description: "",
   });
 
   const handleCreateVehicle = (e: React.FormEvent) => {
     e.preventDefault();
     createVehicle.mutate({ data: newVehicle }, {
       onSuccess: () => {
-        toast({ title: "Vehículo creado exitosamente" });
+        toast({ title: "Vehículo agregado a la flota" });
         setNewVehicle({
-          name: "", brand: "", category: "Sedán", transmission: "Automática", 
-          fuel: "Gasolina", seats: 5, pricePerDay: 50, status: "available", 
-          imageUrl: "", featured: false, description: ""
+          name: "",
+          brand: "",
+          category: "Económico",
+          transmission: "automatic",
+          fuel: "gasoline",
+          seats: 5,
+          pricePerDay: 50,
+          status: "available",
+          imageUrl: "",
+          featured: false,
+          description: "",
         });
-        queryClient.invalidateQueries({ queryKey: getListVehiclesQueryKey() });
-        queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
-      }
+        invalidateAll();
+      },
+      onError: () => {
+        toast({ variant: "destructive", title: "Error", description: "No se pudo agregar el vehículo." });
+      },
     });
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Panel de Administración</h1>
-      </div>
+      <h1 className="text-3xl font-bold mb-8">Panel de Administración</h1>
 
-      {/* Stats Cards */}
+      {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -94,49 +146,41 @@ export default function Admin() {
             <Car className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalVehicles || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <span className="text-green-500 font-medium">{stats?.availableVehicles || 0} disponibles</span>
-            </p>
+            <div className="text-3xl font-bold">{stats?.totalVehicles ?? 0}</div>
+            <p className="text-xs text-green-600 font-medium mt-1">{stats?.availableVehicles ?? 0} disponibles</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Reservas Activas</CardTitle>
             <CalendarCheck className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.activeReservations || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              En este momento
-            </p>
+            <div className="text-3xl font-bold">{stats?.activeReservations ?? 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">{stats?.rentedVehicles ?? 0} vehículos alquilados</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Ingresos del Mes</CardTitle>
             <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats?.monthlyRevenue?.toLocaleString() || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              USD estimados
-            </p>
+            <div className="text-3xl font-bold">${(stats?.monthlyRevenue ?? 0).toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground mt-1">USD en reservas activas</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Nuevos Clientes</CardTitle>
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.newClients || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Este mes
-            </p>
+            <div className="text-3xl font-bold">{stats?.newClients ?? 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Este mes</p>
           </CardContent>
         </Card>
       </div>
@@ -147,9 +191,10 @@ export default function Admin() {
           <TabsTrigger value="reservations" className="rounded-lg text-sm px-6 h-10 data-[state=active]:bg-background data-[state=active]:shadow-sm">Reservas</TabsTrigger>
           <TabsTrigger value="add-vehicle" className="rounded-lg text-sm px-6 h-10 data-[state=active]:bg-background data-[state=active]:shadow-sm">Agregar Vehículo</TabsTrigger>
         </TabsList>
-        
+
+        {/* Tab: Vehículos */}
         <TabsContent value="vehicles" className="mt-0">
-          <Card className="border-0 shadow-lg">
+          <Card className="border shadow-sm">
             <CardHeader className="border-b bg-muted/20">
               <CardTitle>Gestión de Flota</CardTitle>
             </CardHeader>
@@ -161,7 +206,7 @@ export default function Admin() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-16">ID</TableHead>
+                        <TableHead className="w-12">ID</TableHead>
                         <TableHead>Vehículo</TableHead>
                         <TableHead>Categoría</TableHead>
                         <TableHead>Precio/Día</TableHead>
@@ -172,26 +217,48 @@ export default function Admin() {
                     <TableBody>
                       {vehicles?.map((vehicle) => (
                         <TableRow key={vehicle.id}>
-                          <TableCell className="font-mono text-muted-foreground">{vehicle.id}</TableCell>
+                          <TableCell className="font-mono text-muted-foreground text-xs">{vehicle.id}</TableCell>
                           <TableCell className="font-medium">{vehicle.brand} {vehicle.name}</TableCell>
-                          <TableCell className="capitalize">{vehicle.category}</TableCell>
-                          <TableCell>${vehicle.pricePerDay}</TableCell>
+                          <TableCell>{vehicle.category}</TableCell>
+                          <TableCell className="font-semibold">${vehicle.pricePerDay}/día</TableCell>
                           <TableCell>
-                            <Badge variant={vehicle.status === 'available' ? 'default' : vehicle.status === 'rented' ? 'secondary' : 'destructive'} className={
-                              vehicle.status === 'available' ? 'bg-green-100 text-green-800 hover:bg-green-100' :
-                              vehicle.status === 'rented' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
-                              'bg-red-100 text-red-800 hover:bg-red-100'
-                            }>
-                              {vehicle.status}
-                            </Badge>
+                            <Select
+                              value={vehicle.status}
+                              onValueChange={(val) => handleStatusChange(vehicle.id, val)}
+                            >
+                              <SelectTrigger className="w-36 h-8 text-xs">
+                                <SelectValue>
+                                  <Badge className={cn("text-xs", STATUS_CLASSES[vehicle.status] ?? "bg-gray-100 text-gray-800")}>
+                                    {STATUS_LABELS[vehicle.status] ?? vehicle.status}
+                                  </Badge>
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="available">Disponible</SelectItem>
+                                <SelectItem value="rented">Alquilado</SelectItem>
+                                <SelectItem value="maintenance">Mantenimiento</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteVehicle(vehicle.id)} className="text-destructive">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteVehicle(vehicle.id, `${vehicle.brand} ${vehicle.name}`)}
+                              className="text-destructive hover:text-destructive"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </TableCell>
                         </TableRow>
                       ))}
+                      {!vehicles?.length && (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                            No hay vehículos en la flota.
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -199,11 +266,12 @@ export default function Admin() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
+        {/* Tab: Reservas */}
         <TabsContent value="reservations" className="mt-0">
-          <Card className="border-0 shadow-lg">
+          <Card className="border shadow-sm">
             <CardHeader className="border-b bg-muted/20">
-              <CardTitle>Reservas Activas e Historial</CardTitle>
+              <CardTitle>Reservas</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {isLoadingReservations ? (
@@ -213,7 +281,7 @@ export default function Admin() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-16">ID</TableHead>
+                        <TableHead className="w-12">ID</TableHead>
                         <TableHead>Cliente</TableHead>
                         <TableHead>Vehículo</TableHead>
                         <TableHead>Fechas</TableHead>
@@ -225,32 +293,41 @@ export default function Admin() {
                     <TableBody>
                       {reservations?.map((res) => (
                         <TableRow key={res.id}>
-                          <TableCell className="font-mono text-muted-foreground">{res.id}</TableCell>
+                          <TableCell className="font-mono text-muted-foreground text-xs">{res.id}</TableCell>
                           <TableCell>
                             <div className="font-medium">{res.clientName}</div>
                             <div className="text-xs text-muted-foreground">{res.clientEmail}</div>
                           </TableCell>
                           <TableCell>{res.vehicleName}</TableCell>
-                          <TableCell className="text-sm">
-                            {format(new Date(res.pickupDate), "dd/MM/yy")} - {format(new Date(res.dropoffDate), "dd/MM/yy")}
+                          <TableCell className="text-sm text-muted-foreground">
+                            {format(new Date(res.pickupDate + "T12:00:00"), "dd/MM/yyyy")} →{" "}
+                            {format(new Date(res.dropoffDate + "T12:00:00"), "dd/MM/yyyy")}
                           </TableCell>
-                          <TableCell className="font-bold">${res.totalPrice}</TableCell>
+                          <TableCell className="font-bold">${res.totalPrice.toLocaleString()}</TableCell>
                           <TableCell>
-                            <Badge variant="outline" className={
-                              res.status === 'active' ? 'bg-blue-100 text-blue-800' :
-                              res.status === 'completed' ? 'bg-gray-100 text-gray-800' :
-                              'bg-red-100 text-red-800'
-                            }>
-                              {res.status}
+                            <Badge className={RESERVATION_STATUS_CLASSES[res.status] ?? "bg-gray-100 text-gray-800"}>
+                              {RESERVATION_STATUS_LABELS[res.status] ?? res.status}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteReservation(res.id)} className="text-destructive">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteReservation(res.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </TableCell>
                         </TableRow>
                       ))}
+                      {!reservations?.length && (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                            No hay reservas registradas.
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -258,91 +335,99 @@ export default function Admin() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
+        {/* Tab: Agregar vehículo */}
         <TabsContent value="add-vehicle" className="mt-0">
-          <Card className="border-0 shadow-lg max-w-3xl mx-auto">
+          <Card className="border shadow-sm max-w-3xl mx-auto">
             <CardHeader className="border-b bg-muted/20">
               <CardTitle>Agregar Nuevo Vehículo</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <form onSubmit={handleCreateVehicle} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Marca</label>
-                    <Input required value={newVehicle.brand} onChange={e => setNewVehicle({...newVehicle, brand: e.target.value})} placeholder="Ej. Toyota" />
+                    <Input required placeholder="Ej. Toyota" value={newVehicle.brand} onChange={e => setNewVehicle({ ...newVehicle, brand: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Modelo</label>
-                    <Input required value={newVehicle.name} onChange={e => setNewVehicle({...newVehicle, name: e.target.value})} placeholder="Ej. Corolla" />
+                    <Input required placeholder="Ej. Corolla" value={newVehicle.name} onChange={e => setNewVehicle({ ...newVehicle, name: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Categoría</label>
-                    <select 
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={newVehicle.category} 
-                      onChange={e => setNewVehicle({...newVehicle, category: e.target.value})}
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={newVehicle.category}
+                      onChange={e => setNewVehicle({ ...newVehicle, category: e.target.value })}
                     >
-                      <option value="Sedán">Sedán</option>
+                      <option value="Económico">Económico</option>
+                      <option value="Compacto">Compacto</option>
                       <option value="SUV">SUV</option>
+                      <option value="Lujo">Lujo</option>
                       <option value="Deportivo">Deportivo</option>
-                      <option value="Hatchback">Hatchback</option>
-                      <option value="Pickup">Pickup</option>
+                      <option value="Van">Van</option>
+                      <option value="Eléctrico">Eléctrico</option>
+                      <option value="Pick-up">Pick-up</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Precio por Día ($)</label>
-                    <Input required type="number" min="1" value={newVehicle.pricePerDay} onChange={e => setNewVehicle({...newVehicle, pricePerDay: Number(e.target.value)})} />
+                    <label className="text-sm font-medium">Precio por día ($)</label>
+                    <Input required type="number" min="1" value={newVehicle.pricePerDay} onChange={e => setNewVehicle({ ...newVehicle, pricePerDay: Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Transmisión</label>
-                    <select 
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={newVehicle.transmission} 
-                      onChange={e => setNewVehicle({...newVehicle, transmission: e.target.value})}
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={newVehicle.transmission}
+                      onChange={e => setNewVehicle({ ...newVehicle, transmission: e.target.value })}
                     >
-                      <option value="Automática">Automática</option>
-                      <option value="Manual">Manual</option>
+                      <option value="automatic">Automática</option>
+                      <option value="manual">Manual</option>
                     </select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Combustible</label>
-                    <select 
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={newVehicle.fuel} 
-                      onChange={e => setNewVehicle({...newVehicle, fuel: e.target.value})}
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={newVehicle.fuel}
+                      onChange={e => setNewVehicle({ ...newVehicle, fuel: e.target.value })}
                     >
-                      <option value="Gasolina">Gasolina</option>
-                      <option value="Diesel">Diesel</option>
-                      <option value="Híbrido">Híbrido</option>
-                      <option value="Eléctrico">Eléctrico</option>
+                      <option value="gasoline">Gasolina</option>
+                      <option value="diesel">Diésel</option>
+                      <option value="hybrid">Híbrido</option>
+                      <option value="electric">Eléctrico</option>
                     </select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Asientos</label>
-                    <Input required type="number" min="1" max="15" value={newVehicle.seats} onChange={e => setNewVehicle({...newVehicle, seats: Number(e.target.value)})} />
+                    <Input required type="number" min="1" max="15" value={newVehicle.seats} onChange={e => setNewVehicle({ ...newVehicle, seats: Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">URL de Imagen</label>
-                    <Input required type="url" value={newVehicle.imageUrl} onChange={e => setNewVehicle({...newVehicle, imageUrl: e.target.value})} placeholder="https://..." />
+                    <label className="text-sm font-medium">URL de imagen</label>
+                    <Input required type="url" placeholder="https://..." value={newVehicle.imageUrl} onChange={e => setNewVehicle({ ...newVehicle, imageUrl: e.target.value })} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">Descripción</label>
+                    <Input placeholder="Breve descripción del vehículo" value={newVehicle.description} onChange={e => setNewVehicle({ ...newVehicle, description: e.target.value })} />
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-2 pt-2">
-                  <input 
-                    type="checkbox" 
-                    id="featured" 
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    checked={newVehicle.featured} 
-                    onChange={e => setNewVehicle({...newVehicle, featured: e.target.checked})} 
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="featured"
+                    className="h-4 w-4 rounded border-gray-300 accent-primary"
+                    checked={newVehicle.featured}
+                    onChange={e => setNewVehicle({ ...newVehicle, featured: e.target.checked })}
                   />
-                  <label htmlFor="featured" className="text-sm font-medium">
+                  <label htmlFor="featured" className="text-sm font-medium cursor-pointer">
                     Mostrar en destacados de la página principal
                   </label>
                 </div>
-                
-                <div className="pt-4 flex justify-end">
-                  <Button type="submit" disabled={createVehicle.isPending}>
-                    {createVehicle.isPending ? "Guardando..." : "Guardar Vehículo"}
+
+                <div className="flex justify-end pt-2">
+                  <Button type="submit" disabled={createVehicle.isPending} className="px-8">
+                    {createVehicle.isPending ? "Guardando..." : "Agregar a la flota"}
                   </Button>
                 </div>
               </form>
@@ -352,4 +437,8 @@ export default function Admin() {
       </Tabs>
     </div>
   );
+}
+
+function cn(...classes: (string | undefined | false)[]) {
+  return classes.filter(Boolean).join(" ");
 }

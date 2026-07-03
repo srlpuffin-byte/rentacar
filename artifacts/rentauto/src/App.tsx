@@ -7,6 +7,7 @@ import { CartProvider } from "@/components/cart-context";
 
 import Home from "@/pages/home";
 import Fleet from "@/pages/fleet";
+import About from "@/pages/about";
 import HowItWorks from "@/pages/how-it-works";
 import Contact from "@/pages/contact";
 import Admin from "@/pages/admin";
@@ -20,6 +21,8 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/flota" component={Fleet} />
+        <Route path="/nosotros" component={About} />
+        <Route path="/preguntas-frecuentes" component={HowItWorks} />
         <Route path="/como-funciona" component={HowItWorks} />
         <Route path="/contacto" component={Contact} />
         <Route path="/admin" component={Admin} />

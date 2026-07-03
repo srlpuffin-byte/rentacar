@@ -1,5 +1,5 @@
 import { Navbar } from "./navbar";
-import { Footer } from "./footer";
+import { Footer, WhatsAppButton } from "./footer";
 import { CartSidebar } from "./cart-sidebar";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -11,6 +11,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </main>
       <Footer />
       <CartSidebar />
+      <WhatsAppButton />
     </div>
   );
 }
