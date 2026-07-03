@@ -61,7 +61,19 @@ export default function Admin() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
-
+  const [newVehicle, setNewVehicle] = useState({
+    name: "",
+    brand: "",
+    category: "Económico",
+    transmission: "automatic",
+    fuel: "gasoline",
+    seats: 5,
+    pricePerDay: 50,
+    status: "available",
+    imageUrl: "",
+    featured: false,
+    description: "",
+  });
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // En un entorno real esto debería validarse en el backend
@@ -134,19 +146,7 @@ export default function Admin() {
     });
   };
 
-  const [newVehicle, setNewVehicle] = useState({
-    name: "",
-    brand: "",
-    category: "Económico",
-    transmission: "automatic",
-    fuel: "gasoline",
-    seats: 5,
-    pricePerDay: 50,
-    status: "available",
-    imageUrl: "",
-    featured: false,
-    description: "",
-  });
+
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
