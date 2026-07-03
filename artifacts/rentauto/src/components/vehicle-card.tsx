@@ -1,4 +1,4 @@
-import { Vehicle } from "@workspace/api-client-react/src/generated/api.schemas";
+import { Vehicle } from "@workspace/api-client-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Fuel, Settings, Star } from "lucide-react";

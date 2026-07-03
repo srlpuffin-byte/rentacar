@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useListVehicles } from "@workspace/api-client-react";
 import { VehicleCard } from "@/components/vehicle-card";
 import { VehicleModal } from "@/components/vehicle-modal";
-import { Vehicle } from "@workspace/api-client-react/src/generated/api.schemas";
+import { Vehicle } from "@workspace/api-client-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";

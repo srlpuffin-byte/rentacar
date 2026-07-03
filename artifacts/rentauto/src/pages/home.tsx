@@ -4,7 +4,7 @@ import { VehicleCard } from "@/components/vehicle-card";
 import { VehicleModal } from "@/components/vehicle-modal";
 import { FaqSection } from "@/components/faq-section";
 import { HeroVideo } from "@/components/hero-video";
-import { Vehicle } from "@workspace/api-client-react/src/generated/api.schemas";
+import { Vehicle } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
