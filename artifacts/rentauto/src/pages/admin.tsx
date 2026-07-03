@@ -59,6 +59,46 @@ export default function Admin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // En un entorno real esto debería validarse en el backend
+    if (password === import.meta.env.VITE_ADMIN_PASSWORD || password === "admin123") {
+      setIsAuthenticated(true);
+    } else {
+      toast({ variant: "destructive", title: "Contraseña incorrecta" });
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto px-4 py-20 max-w-md">
+        <Card className="border shadow-sm">
+          <CardHeader className="text-center pb-2">
+            <CardTitle>Acceso Administrativo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Contraseña</label>
+                <Input 
+                  type="password" 
+                  value={password} 
+                  onChange={e => setPassword(e.target.value)} 
+                  required 
+                  autoFocus
+                />
+              </div>
+              <Button type="submit" className="w-full">Ingresar</Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: getListVehiclesQueryKey() });
     queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
@@ -107,6 +147,17 @@ export default function Admin() {
     featured: false,
     description: "",
   });
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewVehicle({ ...newVehicle, imageUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleCreateVehicle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -403,8 +454,19 @@ export default function Admin() {
                     <Input required type="number" min="1" max="15" value={newVehicle.seats} onChange={e => setNewVehicle({ ...newVehicle, seats: Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">URL de imagen</label>
-                    <Input required type="url" placeholder="https://..." value={newVehicle.imageUrl} onChange={e => setNewVehicle({ ...newVehicle, imageUrl: e.target.value })} />
+                    <label className="text-sm font-medium">Foto del Vehículo</label>
+                    <Input 
+                      required={!newVehicle.imageUrl}
+                      type="file" 
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleImageUpload} 
+                    />
+                    {newVehicle.imageUrl && (
+                      <div className="mt-2 text-xs text-green-600 font-medium truncate">
+                        ✓ Imagen seleccionada
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">Descripción</label>
