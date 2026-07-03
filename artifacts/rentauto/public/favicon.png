@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Puffin S.R.L. — Importación, Exportación y Servicios Agroindustriales</title>
+    <meta name="description" content="Soluciones integrales para el desarrollo agroindustrial, territorial y aéreo. Importación y exportación de maquinaria pesada, servicios viales, ambientales y aéreos en Argentina y la región." />
+    <meta name="keywords" content="Puffin SRL, importación maquinaria, exportación, agroindustrial, vial, ambiental, excavadoras, retroexcavadoras, servicios aéreos, Argentina" />
+    <meta name="author" content="Puffin S.R.L." />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#13224a" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Puffin S.R.L." />
+    <meta property="og:title" content="Puffin S.R.L. — Soluciones Agroindustriales, Viales y Aéreas" />
+    <meta property="og:description" content="Importación y exportación de maquinaria pesada, servicios viales, ambientales y aéreos. Operamos a escala con criterios internacionales." />
+    <meta property="og:image" content="opengraph.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_AR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Puffin S.R.L. — Soluciones Agroindustriales, Viales y Aéreas" />
+    <meta name="twitter:description" content="Importación y exportación de maquinaria pesada, servicios viales, ambientales y aéreos." />
+    <meta name="twitter:image" content="opengraph.jpg" />
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Puffin S.R.L.",
+        "alternateName": "PUFFIN SRL",
+        "url": "/",
+        "logo": "/favicon.png",
+        "image": "/opengraph.jpg",
+        "description": "Soluciones integrales para el desarrollo agroindustrial, territorial y aéreo. Importación y exportación de maquinaria pesada y servicios viales, ambientales y aéreos.",
+        "email": "a.gelsopuffin@outlook.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "AR"
+        },
+        "sameAs": []
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/index-Cr8MUCzL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B0RvumMC.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
