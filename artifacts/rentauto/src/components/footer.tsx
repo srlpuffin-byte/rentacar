@@ -88,22 +88,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="overflow-hidden rounded-2xl border border-white/10 shadow-lg">
-            <img
-              src="/images/footer/rentacar-promo-1.png"
-              alt={`${siteConfig.name} — servicio personalizado en Miami`}
-              className="w-full h-auto object-cover"
-            />
-          </div>
-          <div className="overflow-hidden rounded-2xl border border-white/10 shadow-lg">
-            <img
-              src="/images/footer/rentacar-promo-2.png"
-              alt={`${siteConfig.name} — autos de calidad, millas ilimitadas`}
-              className="w-full h-auto object-cover"
-            />
-          </div>
-        </div>
+
 
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/50">
           <p>&copy; {new Date().getFullYear()} {siteConfig.name}. Todos los derechos reservados.</p>
