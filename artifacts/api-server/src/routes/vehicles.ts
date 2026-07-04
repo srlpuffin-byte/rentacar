@@ -34,8 +34,13 @@ router.get("/vehicles", async (req, res) => {
 
 router.post("/vehicles", async (req, res) => {
   try {
-    const parsed = CreateVehicleBody.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: "Invalid input" });
+    // Derive imageUrl from imageUrls[0] if imageUrl not provided directly
+    const body = req.body as Record<string, unknown>;
+    if (!body.imageUrl && Array.isArray(body.imageUrls) && body.imageUrls.length > 0) {
+      body.imageUrl = body.imageUrls[0];
+    }
+    const parsed = CreateVehicleBody.safeParse(body);
+    if (!parsed.success) return res.status(400).json({ error: "Invalid input", details: parsed.error.issues });
     const { pricePerDay, ...rest } = parsed.data;
     const [vehicle] = await db.insert(vehiclesTable).values({ ...rest, pricePerDay: String(pricePerDay) }).returning();
     return res.status(201).json({ ...vehicle, pricePerDay: Number(vehicle.pricePerDay), rating: Number(vehicle.rating) });
@@ -62,8 +67,13 @@ router.patch("/vehicles/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
-    const parsed = UpdateVehicleBody.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: "Invalid input" });
+    // Derive imageUrl from imageUrls[0] if imageUrl not provided directly
+    const body = req.body as Record<string, unknown>;
+    if (!body.imageUrl && Array.isArray(body.imageUrls) && body.imageUrls.length > 0) {
+      body.imageUrl = body.imageUrls[0];
+    }
+    const parsed = UpdateVehicleBody.safeParse(body);
+    if (!parsed.success) return res.status(400).json({ error: "Invalid input", details: parsed.error.issues });
     const { pricePerDay, ...rest } = parsed.data;
     const updateData = pricePerDay !== undefined ? { ...rest, pricePerDay: String(pricePerDay) } : rest;
     const [vehicle] = await db.update(vehiclesTable).set(updateData).where(eq(vehiclesTable.id, id)).returning();
