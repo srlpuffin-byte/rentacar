@@ -46,7 +46,7 @@ export default function Home() {
   const [pickupDate, setPickupDate] = useState<Date>();
   const [dropoffDate, setDropoffDate] = useState<Date>();
 
-  const { data: featuredVehicles, isLoading } = useListVehicles({ featured: true });
+  const { data: featuredVehicles, isLoading } = useListVehicles({});
 
   const handleVehicleClick = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);

@@ -14,6 +14,7 @@ export const vehiclesTable = pgTable("vehicles", {
   status: text("status").notNull().default("available"),
   rating: numeric("rating", { precision: 3, scale: 1 }).notNull().default("4.5"),
   imageUrl: text("image_url").notNull(),
+  imageUrls: text("image_urls").array(),
   featured: boolean("featured").notNull().default(false),
   description: text("description"),
 });
