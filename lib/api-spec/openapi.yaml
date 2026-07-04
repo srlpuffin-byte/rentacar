@@ -248,6 +248,10 @@ components:
           type: number
         imageUrl:
           type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
         featured:
           type: boolean
         description:
@@ -283,6 +287,10 @@ components:
           type: string
         imageUrl:
           type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
         featured:
           type: boolean
         description:
@@ -309,6 +317,10 @@ components:
           type: string
         imageUrl:
           type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
         featured:
           type: boolean
         description:

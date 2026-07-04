@@ -13,6 +13,7 @@ import { useCart } from "./cart-context";
 import { useCreateReservation, useUpdateVehicle, getListVehiclesQueryKey, getGetStatsQueryKey } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { VehicleGallery } from "@/components/vehicle-gallery";
 
 interface VehicleModalProps {
   vehicle: Vehicle | null;
@@ -113,13 +114,7 @@ export function VehicleModal({ vehicle, isOpen, onClose }: VehicleModalProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto">
           {/* Imagen e info */}
           <div className="bg-muted flex flex-col">
-            <div className="relative aspect-video bg-gray-200">
-              {vehicle.imageUrl ? (
-                <img src={vehicle.imageUrl} alt={vehicle.name} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground">Sin imagen</div>
-              )}
-            </div>
+            <VehicleGallery vehicle={vehicle} />
 
             <div className="p-6">
               <div className="flex justify-between items-start mb-2">

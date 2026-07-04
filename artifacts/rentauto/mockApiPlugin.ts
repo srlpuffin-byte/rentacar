@@ -12,6 +12,7 @@ type Vehicle = {
   status: string;
   rating: number;
   imageUrl: string;
+  imageUrls?: string[];
   featured: boolean;
   description?: string | null;
 };
@@ -162,6 +163,20 @@ function parseBody(req: import("http").IncomingMessage): Promise<unknown> {
   });
 }
 
+function normalizeVehicleImages(input: {
+  imageUrl?: string;
+  imageUrls?: string[];
+}): Pick<Vehicle, "imageUrl" | "imageUrls"> {
+  const imageUrls =
+    input.imageUrls?.filter(Boolean) ??
+    (input.imageUrl ? [input.imageUrl] : []);
+
+  return {
+    imageUrls,
+    imageUrl: imageUrls[0] ?? input.imageUrl ?? "",
+  };
+}
+
 function filterVehicles(url: URL): Vehicle[] {
   let result = [...vehicles];
 
@@ -232,12 +247,14 @@ export function mockApiPlugin(): Plugin {
 
           if (path === "/api/vehicles" && method === "POST") {
             const body = (await parseBody(req)) as Omit<Vehicle, "id">;
+            const images = normalizeVehicleImages(body);
             const vehicle: Vehicle = {
               id: Math.max(0, ...vehicles.map((v) => v.id)) + 1,
               status: "available",
               rating: 4.5,
               featured: false,
               ...body,
+              ...images,
             };
             vehicles.push(vehicle);
             return sendJson(res, 201, vehicle);
@@ -256,7 +273,14 @@ export function mockApiPlugin(): Plugin {
             if (method === "PATCH") {
               if (index === -1) return sendJson(res, 404, { error: "Not found" });
               const body = (await parseBody(req)) as Partial<Vehicle>;
-              vehicles[index] = { ...vehicles[index], ...body };
+              const images =
+                body.imageUrl !== undefined || body.imageUrls !== undefined
+                  ? normalizeVehicleImages({
+                      imageUrl: body.imageUrl ?? vehicles[index].imageUrl,
+                      imageUrls: body.imageUrls ?? vehicles[index].imageUrls,
+                    })
+                  : {};
+              vehicles[index] = { ...vehicles[index], ...body, ...images };
               return sendJson(res, 200, vehicles[index]);
             }
 

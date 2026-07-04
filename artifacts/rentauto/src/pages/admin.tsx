@@ -14,6 +14,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Car, CalendarCheck, TrendingUp, Users, Trash2 } from "lucide-react";
+import { VehiclePhotosField } from "@/components/vehicle-photos-field";
+import { normalizeVehicleImages } from "@/lib/vehicle-images";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,10 +72,10 @@ export default function Admin() {
     seats: 5,
     pricePerDay: 50,
     status: "available",
-    imageUrl: "",
     featured: false,
     description: "",
   });
+  const [vehicleImages, setVehicleImages] = useState<string[]>([]);
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // En un entorno real esto debería validarse en el backend
@@ -148,20 +150,20 @@ export default function Admin() {
 
 
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setNewVehicle({ ...newVehicle, imageUrl: reader.result as string });
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleCreateVehicle = (e: React.FormEvent) => {
     e.preventDefault();
-    createVehicle.mutate({ data: newVehicle }, {
+
+    const images = normalizeVehicleImages({ imageUrls: vehicleImages });
+    if (!images.imageUrl) {
+      toast({
+        variant: "destructive",
+        title: "Foto requerida",
+        description: "Agregá al menos una foto del vehículo.",
+      });
+      return;
+    }
+
+    createVehicle.mutate({ data: { ...newVehicle, ...images } }, {
       onSuccess: () => {
         toast({ title: "Vehículo agregado a la flota" });
         setNewVehicle({
@@ -173,10 +175,10 @@ export default function Admin() {
           seats: 5,
           pricePerDay: 50,
           status: "available",
-          imageUrl: "",
           featured: false,
           description: "",
         });
+        setVehicleImages([]);
         invalidateAll();
       },
       onError: () => {
@@ -453,21 +455,11 @@ export default function Admin() {
                     <label className="text-sm font-medium">Asientos</label>
                     <Input required type="number" min="1" max="15" value={newVehicle.seats} onChange={e => setNewVehicle({ ...newVehicle, seats: Number(e.target.value) })} />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Foto del Vehículo</label>
-                    <Input 
-                      required={!newVehicle.imageUrl}
-                      type="file" 
-                      accept="image/*"
-                      capture="environment"
-                      onChange={handleImageUpload} 
-                    />
-                    {newVehicle.imageUrl && (
-                      <div className="mt-2 text-xs text-green-600 font-medium truncate">
-                        ✓ Imagen seleccionada
-                      </div>
-                    )}
-                  </div>
+                  <VehiclePhotosField
+                    images={vehicleImages}
+                    onChange={setVehicleImages}
+                    inputId="new-vehicle-photos"
+                  />
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">Descripción</label>
                     <Input placeholder="Breve descripción del vehículo" value={newVehicle.description} onChange={e => setNewVehicle({ ...newVehicle, description: e.target.value })} />

@@ -21,6 +21,8 @@ export interface Vehicle {
   status: string;
   rating: number;
   imageUrl: string;
+  /** @nullable */
+  imageUrls?: string[] | null;
   featured: boolean;
   /** @nullable */
   description?: string | null;
@@ -36,6 +38,7 @@ export interface VehicleInput {
   pricePerDay: number;
   status?: string;
   imageUrl: string;
+  imageUrls?: string[];
   featured?: boolean;
   description?: string;
 }
@@ -50,6 +53,7 @@ export interface VehicleUpdate {
   pricePerDay?: number;
   status?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   featured?: boolean;
   description?: string;
 }
