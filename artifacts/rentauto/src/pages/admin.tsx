@@ -13,7 +13,8 @@ import {
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Car, CalendarCheck, TrendingUp, Users, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Car, CalendarCheck, TrendingUp, Users, Trash2, Pencil } from "lucide-react";
 import { VehiclePhotosField } from "@/components/vehicle-photos-field";
 import { normalizeVehicleImages } from "@/lib/vehicle-images";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -76,6 +77,9 @@ export default function Admin() {
     description: "",
   });
   const [vehicleImages, setVehicleImages] = useState<string[]>([]);
+  const [editingVehicle, setEditingVehicle] = useState<any>(null);
+  const [editVehicleImages, setEditVehicleImages] = useState<string[]>([]);
+  
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // En un entorno real esto debería validarse en el backend
@@ -187,6 +191,35 @@ export default function Admin() {
     });
   };
 
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingVehicle) return;
+
+    const images = normalizeVehicleImages({ imageUrls: editVehicleImages });
+    if (!images.imageUrl) {
+      toast({
+        variant: "destructive",
+        title: "Foto requerida",
+        description: "Agregá al menos una foto del vehículo.",
+      });
+      return;
+    }
+
+    updateVehicle.mutate({ 
+      id: editingVehicle.id, 
+      data: { ...editingVehicle, ...images } 
+    }, {
+      onSuccess: () => {
+        toast({ title: "Vehículo actualizado" });
+        setEditingVehicle(null);
+        invalidateAll();
+      },
+      onError: () => {
+        toast({ variant: "destructive", title: "Error", description: "No se pudo actualizar el vehículo." });
+      },
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Panel de Administración</h1>
@@ -293,7 +326,18 @@ export default function Admin() {
                               </SelectContent>
                             </Select>
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right whitespace-nowrap">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setEditingVehicle(vehicle);
+                                setEditVehicleImages(vehicle.imageUrls || (vehicle.imageUrl ? [vehicle.imageUrl] : []));
+                              }}
+                              className="text-primary hover:text-primary mr-1"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -489,6 +533,108 @@ export default function Admin() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!editingVehicle} onOpenChange={(open) => !open && setEditingVehicle(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Vehículo</DialogTitle>
+          </DialogHeader>
+          {editingVehicle && (
+            <form onSubmit={handleEditSubmit} className="space-y-6 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Marca</label>
+                  <Input required value={editingVehicle.brand} onChange={e => setEditingVehicle({ ...editingVehicle, brand: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Modelo</label>
+                  <Input required value={editingVehicle.name} onChange={e => setEditingVehicle({ ...editingVehicle, name: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Categoría</label>
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    value={editingVehicle.category}
+                    onChange={e => setEditingVehicle({ ...editingVehicle, category: e.target.value })}
+                  >
+                    <option value="Económico">Económico</option>
+                    <option value="Compacto">Compacto</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Lujo">Lujo</option>
+                    <option value="Deportivo">Deportivo</option>
+                    <option value="Van">Van</option>
+                    <option value="Eléctrico">Eléctrico</option>
+                    <option value="Pick-up">Pick-up</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Precio por día ($)</label>
+                  <Input required type="number" min="1" value={editingVehicle.pricePerDay} onChange={e => setEditingVehicle({ ...editingVehicle, pricePerDay: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Transmisión</label>
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    value={editingVehicle.transmission}
+                    onChange={e => setEditingVehicle({ ...editingVehicle, transmission: e.target.value })}
+                  >
+                    <option value="automatic">Automática</option>
+                    <option value="manual">Manual</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Combustible</label>
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    value={editingVehicle.fuel}
+                    onChange={e => setEditingVehicle({ ...editingVehicle, fuel: e.target.value })}
+                  >
+                    <option value="gasoline">Gasolina</option>
+                    <option value="diesel">Diésel</option>
+                    <option value="hybrid">Híbrido</option>
+                    <option value="electric">Eléctrico</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Asientos</label>
+                  <Input required type="number" min="1" max="15" value={editingVehicle.seats} onChange={e => setEditingVehicle({ ...editingVehicle, seats: Number(e.target.value) })} />
+                </div>
+                <VehiclePhotosField
+                  images={editVehicleImages}
+                  onChange={setEditVehicleImages}
+                  inputId="edit-vehicle-photos"
+                />
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-medium">Descripción</label>
+                  <Input placeholder="Breve descripción del vehículo" value={editingVehicle.description || ""} onChange={e => setEditingVehicle({ ...editingVehicle, description: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="edit-featured"
+                  className="h-4 w-4 rounded border-gray-300 accent-primary"
+                  checked={editingVehicle.featured || false}
+                  onChange={e => setEditingVehicle({ ...editingVehicle, featured: e.target.checked })}
+                />
+                <label htmlFor="edit-featured" className="text-sm font-medium cursor-pointer">
+                  Mostrar en destacados de la página principal
+                </label>
+              </div>
+
+              <div className="flex justify-end pt-4 gap-2">
+                <Button type="button" variant="outline" onClick={() => setEditingVehicle(null)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={updateVehicle.isPending}>
+                  {updateVehicle.isPending ? "Guardando..." : "Guardar cambios"}
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
