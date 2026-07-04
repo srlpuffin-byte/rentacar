@@ -14,6 +14,7 @@ import { useCreateReservation, useUpdateVehicle, getListVehiclesQueryKey, getGet
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { VehicleGallery } from "@/components/vehicle-gallery";
+import { siteConfig } from "@/lib/site-content";
 
 interface VehicleModalProps {
   vehicle: Vehicle | null;
@@ -92,6 +93,10 @@ export function VehicleModal({ vehicle, isOpen, onClose }: VehicleModalProps) {
         queryClient.invalidateQueries({ queryKey: getListVehiclesQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
         handleClose();
+
+        const message = encodeURIComponent(`Hola, quisiera consultar por la reserva que acabo de realizar para el ${vehicle.brand} ${vehicle.name} desde el ${format(pickupDate, "dd/MM/yyyy")} hasta el ${format(dropoffDate, "dd/MM/yyyy")}. Mi nombre es ${clientName.trim()}.`);
+        const whatsappUrl = `${siteConfig.whatsapp}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
       },
       onError: () => {
         toast({
