@@ -29,7 +29,8 @@ router.get("/vehicles", async (req, res) => {
     return res.json(vehicles);
   } catch (err) {
     req.log.error(err);
-    return res.status(500).json({ error: "Internal server error" });
+    const message = err instanceof Error ? err.message : String(err);
+    return res.status(500).json({ error: "Internal server error", detail: message });
   }
 });
 
