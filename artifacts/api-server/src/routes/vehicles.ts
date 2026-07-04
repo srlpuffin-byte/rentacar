@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, vehiclesTable } from "@workspace/db";
 import { eq, lte, and, type SQL } from "drizzle-orm";
 import { ListVehiclesQueryParams, CreateVehicleBody, UpdateVehicleBody } from "@workspace/api-zod";
+import { uploadBase64Image } from "../lib/cloudinary";
 
 const router = Router();
 
@@ -39,6 +40,20 @@ router.post("/vehicles", async (req, res) => {
     if (!body.imageUrl && Array.isArray(body.imageUrls) && body.imageUrls.length > 0) {
       body.imageUrl = body.imageUrls[0];
     }
+
+    // Upload base64 images to Cloudinary
+    if (typeof body.imageUrl === 'string' && body.imageUrl.startsWith('data:image/')) {
+      body.imageUrl = await uploadBase64Image(body.imageUrl);
+    }
+    if (Array.isArray(body.imageUrls)) {
+      body.imageUrls = await Promise.all(body.imageUrls.map(async (url) => {
+        if (typeof url === 'string' && url.startsWith('data:image/')) {
+          return await uploadBase64Image(url);
+        }
+        return url;
+      }));
+    }
+
     const parsed = CreateVehicleBody.safeParse(body);
     if (!parsed.success) return res.status(400).json({ error: "Invalid input", details: parsed.error.issues });
     const { pricePerDay, ...rest } = parsed.data;
@@ -72,6 +87,20 @@ router.patch("/vehicles/:id", async (req, res) => {
     if (!body.imageUrl && Array.isArray(body.imageUrls) && body.imageUrls.length > 0) {
       body.imageUrl = body.imageUrls[0];
     }
+
+    // Upload base64 images to Cloudinary
+    if (typeof body.imageUrl === 'string' && body.imageUrl.startsWith('data:image/')) {
+      body.imageUrl = await uploadBase64Image(body.imageUrl);
+    }
+    if (Array.isArray(body.imageUrls)) {
+      body.imageUrls = await Promise.all(body.imageUrls.map(async (url) => {
+        if (typeof url === 'string' && url.startsWith('data:image/')) {
+          return await uploadBase64Image(url);
+        }
+        return url;
+      }));
+    }
+
     const parsed = UpdateVehicleBody.safeParse(body);
     if (!parsed.success) return res.status(400).json({ error: "Invalid input", details: parsed.error.issues });
     const { pricePerDay, ...rest } = parsed.data;
