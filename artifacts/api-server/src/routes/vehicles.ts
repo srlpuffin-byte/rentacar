@@ -17,14 +17,32 @@ router.get("/vehicles", async (req, res) => {
     if (params.maxPrice) conditions.push(lte(vehiclesTable.pricePerDay, String(params.maxPrice)));
     if (params.featured !== undefined) conditions.push(eq(vehiclesTable.featured, params.featured));
 
+    // Select only lightweight columns — skip imageUrls to avoid OOM from legacy base64 blobs
+    const columns = {
+      id: vehiclesTable.id,
+      name: vehiclesTable.name,
+      brand: vehiclesTable.brand,
+      category: vehiclesTable.category,
+      transmission: vehiclesTable.transmission,
+      fuel: vehiclesTable.fuel,
+      seats: vehiclesTable.seats,
+      pricePerDay: vehiclesTable.pricePerDay,
+      status: vehiclesTable.status,
+      rating: vehiclesTable.rating,
+      imageUrl: vehiclesTable.imageUrl,
+      featured: vehiclesTable.featured,
+      description: vehiclesTable.description,
+    };
+
     const rows = conditions.length > 0
-      ? await db.select().from(vehiclesTable).where(and(...conditions))
-      : await db.select().from(vehiclesTable);
+      ? await db.select(columns).from(vehiclesTable).where(and(...conditions))
+      : await db.select(columns).from(vehiclesTable);
 
     const vehicles = rows.map((v) => ({
       ...v,
       pricePerDay: Number(v.pricePerDay),
       rating: Number(v.rating),
+      imageUrls: [v.imageUrl].filter(Boolean),
     }));
     return res.json(vehicles);
   } catch (err) {
@@ -33,6 +51,7 @@ router.get("/vehicles", async (req, res) => {
     return res.status(500).json({ error: "Internal server error", detail: message });
   }
 });
+
 
 router.post("/vehicles", async (req, res) => {
   try {
@@ -70,14 +89,36 @@ router.get("/vehicles/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
-    const [vehicle] = await db.select().from(vehiclesTable).where(eq(vehiclesTable.id, id));
+    // Skip imageUrls to avoid OOM from legacy base64 blobs stored in DB
+    const columns = {
+      id: vehiclesTable.id,
+      name: vehiclesTable.name,
+      brand: vehiclesTable.brand,
+      category: vehiclesTable.category,
+      transmission: vehiclesTable.transmission,
+      fuel: vehiclesTable.fuel,
+      seats: vehiclesTable.seats,
+      pricePerDay: vehiclesTable.pricePerDay,
+      status: vehiclesTable.status,
+      rating: vehiclesTable.rating,
+      imageUrl: vehiclesTable.imageUrl,
+      featured: vehiclesTable.featured,
+      description: vehiclesTable.description,
+    };
+    const [vehicle] = await db.select(columns).from(vehiclesTable).where(eq(vehiclesTable.id, id));
     if (!vehicle) return res.status(404).json({ error: "Not found" });
-    return res.json({ ...vehicle, pricePerDay: Number(vehicle.pricePerDay), rating: Number(vehicle.rating) });
+    return res.json({
+      ...vehicle,
+      pricePerDay: Number(vehicle.pricePerDay),
+      rating: Number(vehicle.rating),
+      imageUrls: [vehicle.imageUrl].filter(Boolean),
+    });
   } catch (err) {
     req.log.error(err);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 router.patch("/vehicles/:id", async (req, res) => {
   try {
