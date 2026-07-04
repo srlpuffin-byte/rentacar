@@ -40,6 +40,7 @@ export const ListVehiclesResponseItem = zod.object({
   "status": zod.string(),
   "rating": zod.number(),
   "imageUrl": zod.string(),
+  "imageUrls": zod.array(zod.string()).optional(),
   "featured": zod.boolean(),
   "description": zod.string().nullish()
 })
@@ -59,6 +60,7 @@ export const CreateVehicleBody = zod.object({
   "pricePerDay": zod.number(),
   "status": zod.string().optional(),
   "imageUrl": zod.string(),
+  "imageUrls": zod.array(zod.string()).optional(),
   "featured": zod.boolean().optional(),
   "description": zod.string().optional()
 })
@@ -75,6 +77,7 @@ export const CreateVehicleResponse = zod.object({
   "status": zod.string(),
   "rating": zod.number(),
   "imageUrl": zod.string(),
+  "imageUrls": zod.array(zod.string()).optional(),
   "featured": zod.boolean(),
   "description": zod.string().nullish()
 })
@@ -99,6 +102,7 @@ export const GetVehicleResponse = zod.object({
   "status": zod.string(),
   "rating": zod.number(),
   "imageUrl": zod.string(),
+  "imageUrls": zod.array(zod.string()).optional(),
   "featured": zod.boolean(),
   "description": zod.string().nullish()
 })
@@ -121,6 +125,7 @@ export const UpdateVehicleBody = zod.object({
   "pricePerDay": zod.number().optional(),
   "status": zod.string().optional(),
   "imageUrl": zod.string().optional(),
+  "imageUrls": zod.array(zod.string()).optional(),
   "featured": zod.boolean().optional(),
   "description": zod.string().optional()
 })
@@ -137,6 +142,7 @@ export const UpdateVehicleResponse = zod.object({
   "status": zod.string(),
   "rating": zod.number(),
   "imageUrl": zod.string(),
+  "imageUrls": zod.array(zod.string()).optional(),
   "featured": zod.boolean(),
   "description": zod.string().nullish()
 })

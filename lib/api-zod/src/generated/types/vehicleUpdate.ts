@@ -16,6 +16,7 @@ export interface VehicleUpdate {
   pricePerDay?: number;
   status?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   featured?: boolean;
   description?: string;
 }

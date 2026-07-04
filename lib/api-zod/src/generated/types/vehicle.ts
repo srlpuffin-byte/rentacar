@@ -18,6 +18,7 @@ export interface Vehicle {
   status: string;
   rating: number;
   imageUrl: string;
+  imageUrls?: string[];
   featured: boolean;
   /** @nullable */
   description?: string | null;
