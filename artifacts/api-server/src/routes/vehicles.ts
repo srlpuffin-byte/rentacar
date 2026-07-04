@@ -81,7 +81,8 @@ router.post("/vehicles", async (req, res) => {
     return res.status(201).json({ ...vehicle, pricePerDay: Number(vehicle.pricePerDay), rating: Number(vehicle.rating) });
   } catch (err) {
     req.log.error(err);
-    return res.status(500).json({ error: "Internal server error" });
+    const message = err instanceof Error ? err.message : String(err);
+    return res.status(500).json({ error: "Internal server error", detail: message });
   }
 });
 
