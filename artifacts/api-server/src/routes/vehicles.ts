@@ -17,7 +17,6 @@ router.get("/vehicles", async (req, res) => {
     if (params.maxPrice) conditions.push(lte(vehiclesTable.pricePerDay, String(params.maxPrice)));
     if (params.featured !== undefined) conditions.push(eq(vehiclesTable.featured, params.featured));
 
-    // Select only lightweight columns — skip imageUrls to avoid OOM from legacy base64 blobs
     const columns = {
       id: vehiclesTable.id,
       name: vehiclesTable.name,
@@ -30,6 +29,7 @@ router.get("/vehicles", async (req, res) => {
       status: vehiclesTable.status,
       rating: vehiclesTable.rating,
       imageUrl: vehiclesTable.imageUrl,
+      imageUrls: vehiclesTable.imageUrls,
       featured: vehiclesTable.featured,
       description: vehiclesTable.description,
     };
@@ -42,7 +42,7 @@ router.get("/vehicles", async (req, res) => {
       ...v,
       pricePerDay: Number(v.pricePerDay),
       rating: Number(v.rating),
-      imageUrls: [v.imageUrl].filter(Boolean),
+      imageUrls: (v.imageUrls && v.imageUrls.length > 0) ? v.imageUrls : [v.imageUrl].filter(Boolean),
     }));
     return res.json(vehicles);
   } catch (err) {
@@ -90,7 +90,6 @@ router.get("/vehicles/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
-    // Skip imageUrls to avoid OOM from legacy base64 blobs stored in DB
     const columns = {
       id: vehiclesTable.id,
       name: vehiclesTable.name,
@@ -103,6 +102,7 @@ router.get("/vehicles/:id", async (req, res) => {
       status: vehiclesTable.status,
       rating: vehiclesTable.rating,
       imageUrl: vehiclesTable.imageUrl,
+      imageUrls: vehiclesTable.imageUrls,
       featured: vehiclesTable.featured,
       description: vehiclesTable.description,
     };
@@ -112,7 +112,7 @@ router.get("/vehicles/:id", async (req, res) => {
       ...vehicle,
       pricePerDay: Number(vehicle.pricePerDay),
       rating: Number(vehicle.rating),
-      imageUrls: [vehicle.imageUrl].filter(Boolean),
+      imageUrls: (vehicle.imageUrls && vehicle.imageUrls.length > 0) ? vehicle.imageUrls : [vehicle.imageUrl].filter(Boolean),
     });
   } catch (err) {
     req.log.error(err);
